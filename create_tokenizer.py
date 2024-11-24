@@ -13,6 +13,8 @@ special_tokens = dict()
 for i, pres in enumerate(unique_presidents):
     special_tokens[f'<President: {pres}>'] = len(gpt2_base._mergeable_ranks)+i+1
     
+special_tokens['<PAD>'] = len(gpt2_base._mergeable_ranks)+len(special_tokens)+1
+    
 pres_enc = tiktoken.Encoding(
     name="pres_encoding",
     pat_str=gpt2_base._pat_str,
