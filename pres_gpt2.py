@@ -4,11 +4,12 @@ from torch.nn import functional as F
 
 # parameters for GPT-2 
 class GPTConfig:
-    block_size: int = 1024 # AKA max seq length
-    vocab_size: int = 50257
-    n_layers: int = 12
-    n_heads: int = 12
-    n_embd: int = 768
+    def __init__(self, block_size, vocab_size, n_layers, n_heads, n_embd):
+        self.block_size = block_size
+        self.vocab_size = vocab_size
+        self.n_layers = n_layers
+        self.n_heads = n_heads
+        self.n_embd = n_embd
     
 """ one head of self-attention """
 class Head(nn.Module):
@@ -57,7 +58,7 @@ class MLP(nn.Module):
         super().__init__()
         self.c_fc = nn.Linear(config.n_embd, 4*config.n_embd)
         self.gelu = nn.GELU(approximate='tanh')
-        self.c_proj = nn.Linear(4*config.n_embd, 4*config.n_embd, config.n_embd)
+        self.c_proj = nn.Linear(4*config.n_embd, config.n_embd)
         self.c_proj.STD_SCALE_INIT = 1
 
     def forward(self, x):
@@ -66,7 +67,7 @@ class MLP(nn.Module):
         return self.c_proj(x)
 
 class Block(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config: GPTConfig):
         super().__init__()
         
         self.ln_1 = nn.LayerNorm(config.n_embd)
@@ -91,7 +92,7 @@ class PresGPT(nn.Module):
             dict(
                 wte = nn.Embedding(config.vocab_size, config.n_embd),
                 wpe = nn.Embedding(config.block_size, config.n_embd),
-                h = nn.ModuleList([Block(config) for _ in range(config.n_layer)]),
+                h = nn.ModuleList([Block(config) for _ in range(config.n_layers)]),
                 ln_f = nn.LayerNorm(config.n_embd)
             )
         )
@@ -129,13 +130,13 @@ class PresGPT(nn.Module):
         for b in self.transformer.h:
             x = b(x)
             
-        x = self.transforer.ln_f(x)
+        x = self.transformer.ln_f(x)
         
         loss = None
-        logits = self.lm_header(x) # B x T x vocab_size
+        logits = self.lm_head(x) # B x T x vocab_size
         
         if y is not None:
-            logits = self.lm_header(x)
+            logits = self.lm_head(x)
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), y.view(-1))
             
         return logits, loss

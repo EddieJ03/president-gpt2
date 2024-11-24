@@ -1,1 +1,3 @@
-# president-gpt2
+# PresGPT2
+
+A GPT trained to generate speeches from presidents.
