@@ -63,6 +63,7 @@ class MyTrainer:
         self.optimizer.zero_grad()
         logits, loss = self.model(source)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
         self.optimizer.step() # after this step DDP will make sure all gradients will be synced
         return loss.item()
 
