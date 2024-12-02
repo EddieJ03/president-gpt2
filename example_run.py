@@ -1,5 +1,5 @@
 import torch
-from pres_gpt2 import PresGPT, GPTConfig 
+from pres_gpt2 import PresGPT2, GPTConfig 
 from Dataset import PresidentDataset
 
 import pickle
@@ -28,7 +28,7 @@ config: GPTConfig = GPTConfig(
     768
 )
 
-model: PresGPT = PresGPT(config)
+model: PresGPT2 = PresGPT2(config)
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
 

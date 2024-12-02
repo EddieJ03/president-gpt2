@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import pandas as pd
 import torch
-from pres_gpt2 import PresGPT, GPTConfig 
+from pres_gpt2 import GPTConfig 
 import torch.nn.functional as F
 
 import pickle as pkl
