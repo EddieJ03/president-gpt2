@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from pres_gpt2 import PresGPT, GPTConfig 
+from pres_gpt2 import PresGPT2, GPTConfig 
 from Dataset import PresidentDataset
 
 import tiktoken
