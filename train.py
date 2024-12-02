@@ -39,7 +39,7 @@ def load_train_objs():
 
     model: PresGPT2 = PresGPT2(config)
     
-    param_dict = { name: params for name, params in model.parameters() }
+    param_dict = { name: params for name, params in model.named_parameters() }
     param_dict_grad = { name: params for name, params in param_dict.items() if params.requires_grad }
     
     optim_params = [
