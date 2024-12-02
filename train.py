@@ -38,8 +38,16 @@ def load_train_objs():
     )
 
     model: PresGPT = PresGPT(config)
+    
+    param_dict = { name: params for name, params in model.parameters() }
+    param_dict_grad = { name: params for name, params in param_dict.items() if params.requires_grad }
+    
+    optim_params = [
+        { 'params': [p for _, p in param_dict_grad.items() if p.dim() >= 2], 'weight_decay': 0.1 },
+        { 'params': [p for _, p in param_dict_grad.items() if p.dim() < 2], 'weight_decay': 0 }
+    ]
 
-    optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
+    optimizer = torch.optim.AdamW(optim_params, betas=(0.9, 0.95), lr=3e-4)
     
     return train_dataset, validation_dataset, model, optimizer, pres_enc
 
