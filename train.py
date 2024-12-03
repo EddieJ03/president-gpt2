@@ -74,8 +74,8 @@ def multi_gpu(rank, world_size, total_epochs, save_every):
     ddp_setup(rank, world_size)
     
     train_dataset, validation_dataset, model, optimizer, _ = load_train_objs()
-    train_data = prepare_dataloader(train_dataset, batch_size=32, distributed=True)
-    validation_data = prepare_dataloader(validation_dataset, batch_size=32, distributed=True)
+    train_data = prepare_dataloader(train_dataset, batch_size=16, distributed=True)
+    validation_data = prepare_dataloader(validation_dataset, batch_size=16, distributed=True)
     
     trainer = MyTrainer(model, train_data, validation_data, optimizer, True, False, rank, save_every, "")
     trainer.train(total_epochs)

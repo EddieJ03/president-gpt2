@@ -90,7 +90,7 @@ class MyTrainer:
         with torch.no_grad():
             for X, Y in self.validation_data:
                 X, Y = X.to(self.gpu_id), Y.to(self.gpu_id)
-                _, loss = self.model(X)
+                _, loss = self.model(X, Y)
                 
                 val_loss += loss.item()
             
