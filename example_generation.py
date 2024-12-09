@@ -24,9 +24,13 @@ model.load_state_dict(checkpoint)
 
 model.eval()
 
-generation_len = 20
+generation_len = 100
 
-text = "<President: Barack Obama> Today marks the first day of"
+top_k = 200
+
+temperature = 0.8 
+
+text = "<President: Donald Trump> Today marks the first day of"
 
 text_tokens = torch.tensor(pres_enc.encode(text, allowed_special='all'))
 
@@ -35,16 +39,18 @@ text_tokens = torch.unsqueeze(text_tokens, 0)
 for i in range(generation_len):
     logits, _ = model(text_tokens)
     
-    logits = logits[:, -1, :] # B x T x vocab_size -> B x vocab_size
+    logits = logits[:, -1, :] / temperature # B x T x vocab_size -> B x vocab_size
+    
+    values, _ = torch.topk(logits, top_k) # values is descending
+    logits[logits < values[:, [-1]]] = -float('Inf') # for all possible logtis for a sequence, if less than smallest topk set to negative inf
     
     # softmax over logits to get probabilities
-    probs = F.softmax(logits, dim=1)
+    probs = F.softmax(logits, dim=1) # dim=1 means we compute softmax over COLUMNS IN A ROW!!
     
-    max_idx = torch.argmax(probs, dim=1)
+    # introduce a little variability in the generated text
+    next_idx = torch.multinomial(probs, num_samples=1)
     
-    max_idx = torch.unsqueeze(max_idx, 0)
-    
-    text_tokens = torch.cat((text_tokens, max_idx), dim=1)
+    text_tokens = torch.cat((text_tokens, next_idx), dim=1)
     
 for conv in list(text_tokens):
     print(pres_enc.decode(list(conv)))
