@@ -68,6 +68,9 @@ class MyTrainer:
         return loss.item()
 
     def _run_epoch(self, epoch):
+        if self.distributed and isinstance(self.train_data.sampler, DistributedSampler):
+            self.train_data.sampler.set_epoch(epoch)
+        
         b_sz = len(next(iter(self.train_data))[0])
         print(f"[GPU{self.gpu_id}] Epoch {epoch} | Batchsize: {b_sz} | Steps: {len(self.train_data)}")
         
@@ -88,6 +91,9 @@ class MyTrainer:
         val_loss = 0
         
         with torch.no_grad():
+            if self.distributed and isinstance(self.validation_data.sampler, DistributedSampler):
+                self.validation_data.sampler.set_epoch(epoch)
+            
             for X, Y in self.validation_data:
                 X, Y = X.to(self.gpu_id), Y.to(self.gpu_id)
                 _, loss = self.model(X, Y)
