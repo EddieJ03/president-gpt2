@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torch.nn.parallel import DistributedDataParallel as DDP
 import os
+from torch.utils.data.distributed import DistributedSampler
 
 from pres_gpt2 import PresGPT2
 
